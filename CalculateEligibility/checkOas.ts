@@ -39,7 +39,14 @@ export default function checkOas(
     : undefined;
 
   // main checks
-  if (canadianCitizen && value.yearsInCanadaSince18 >= requiredYearsInCanada) {
+  if (value.income >= 129757) {
+    return {
+      result: ResultOptions.INELIGIBLE,
+      reason: ResultReasons.INCOME,
+      detail: 'Your income is too high to be eligible for OAS.',
+    };
+  }
+  else if (canadianCitizen && value.yearsInCanadaSince18 >= requiredYearsInCanada) {
     if (value.age >= 65) {
       return {
         result: ResultOptions.ELIGIBLE,

@@ -11,11 +11,11 @@ import { validateRequestForBenefit } from './validator';
 
 export default function checkGis(
   params: CalculationParams,
-  oasResult: ResultOptions,
+  oasResult: CalculationResult,
   context: Context
 ): CalculationResult {
   // include OAS result
-  const paramsWithOas = { ...params, _oasEligible: oasResult };
+  const paramsWithOas = { ...params, _oasEligible: oasResult.result };
 
   // validation
   const { result, value } = validateRequestForBenefit(
@@ -32,18 +32,18 @@ export default function checkGis(
     value.maritalStatus == MaritalStatusOptions.COMMONLAW;
 
   // initial checks
-  if (oasResult == ResultOptions.INELIGIBLE) {
+  if (oasResult.result == ResultOptions.INELIGIBLE) {
     return {
       result: ResultOptions.INELIGIBLE,
       reason: ResultReasons.OAS,
       detail: 'You need to be eligible for OAS to be eligible for GIS.',
     };
-  } else if (
-    oasResult == ResultOptions.MORE_INFO ||
-    value.maritalStatus === undefined ||
-    value.income === undefined
-  ) {
-    throw new Error('should not be here');
+  } else if (oasResult.result == ResultOptions.MORE_INFO) {
+    return {
+      result: ResultOptions.MORE_INFO,
+      reason: ResultReasons.MORE_INFO,
+      detail: 'You need to complete the OAS eligibilty check first.',
+    };
   }
 
   // determine max income

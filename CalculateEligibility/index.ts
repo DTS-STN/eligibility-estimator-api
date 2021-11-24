@@ -23,7 +23,7 @@ const httpTrigger: AzureFunction = async function (
     const resultOas = checkOas(value, context);
     context.log('OAS Result: ', resultOas);
 
-    const resultGis = checkGis(value, resultOas.result, context);
+    const resultGis = checkGis(value, resultOas, context);
     context.log('GIS Result: ', resultGis);
 
     const allFields = [

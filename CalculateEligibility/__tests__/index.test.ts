@@ -73,8 +73,22 @@ describe('sanity checks', () => {
 });
 
 describe('field requirement analysis', () => {
-  it('requires 4 OAS and 2 GIS fields when nothing provided', async () => {
+  it('requires 1 OAS and 1 GIS fields when nothing provided', async () => {
     const { res } = await mockedRequestFactory({});
+    expect(res.body.oas.result).toEqual(ResultOptions.MORE_INFO);
+    expect(res.body.oas.reason).toEqual(ResultReasons.MORE_INFO);
+    expect(res.body.oas.missingFields.toString()).toEqual(
+      ['income'].toString()
+    );
+    expect(res.body.gis.result).toEqual(ResultOptions.MORE_INFO);
+    expect(res.body.gis.reason).toEqual(ResultReasons.MORE_INFO);
+    expect(res.body.gis.missingFields.toString()).toEqual(
+      ['income'].toString()
+    );
+    expect(res.body.allFields.toString()).toEqual(['income'].toString());
+  });
+  it('requires 4 OAS and 0 GIS fields when only income provided', async () => {
+    const { res } = await mockedRequestFactory({ income: 10000 });
     expect(res.body.oas.result).toEqual(ResultOptions.MORE_INFO);
     expect(res.body.oas.reason).toEqual(ResultReasons.MORE_INFO);
     expect(res.body.oas.missingFields.toString()).toEqual(
@@ -82,22 +96,19 @@ describe('field requirement analysis', () => {
     );
     expect(res.body.gis.result).toEqual(ResultOptions.MORE_INFO);
     expect(res.body.gis.reason).toEqual(ResultReasons.MORE_INFO);
-    expect(res.body.gis.missingFields.toString()).toEqual(
-      ['maritalStatus', 'income'].toString()
-    );
+    expect(res.body.gis.missingFields).toBeUndefined();
     expect(res.body.allFields.toString()).toEqual(
       [
+        'income',
         'age',
         'livingCountry',
         'legalStatus',
         'yearsInCanadaSince18',
-        'maritalStatus',
-        'income',
       ].toString()
     );
   });
-  it('requires 3 OAS and 2 GIS fields when only age 65 provided', async () => {
-    const { res } = await mockedRequestFactory({ age: 65 });
+  it('requires 3 OAS and 0 GIS fields when only income/age provided', async () => {
+    const { res } = await mockedRequestFactory({ income: 10000, age: 65 });
     expect(res.body.oas.result).toEqual(ResultOptions.MORE_INFO);
     expect(res.body.oas.reason).toEqual(ResultReasons.MORE_INFO);
     expect(res.body.oas.missingFields.toString()).toEqual(
@@ -105,45 +116,20 @@ describe('field requirement analysis', () => {
     );
     expect(res.body.gis.result).toEqual(ResultOptions.MORE_INFO);
     expect(res.body.gis.reason).toEqual(ResultReasons.MORE_INFO);
-    expect(res.body.gis.missingFields.toString()).toEqual(
-      ['maritalStatus', 'income'].toString()
-    );
+    expect(res.body.gis.missingFields).toBeUndefined();
     expect(res.body.allFields.toString()).toEqual(
       [
+        'income',
         'age',
         'livingCountry',
         'legalStatus',
         'yearsInCanadaSince18',
-        'maritalStatus',
-        'income',
       ].toString()
     );
   });
-  it('requires 3 OAS and 2 GIS fields when only age 64 provided', async () => {
-    const { res } = await mockedRequestFactory({ age: 64 });
-    expect(res.body.oas.result).toEqual(ResultOptions.MORE_INFO);
-    expect(res.body.oas.reason).toEqual(ResultReasons.MORE_INFO);
-    expect(res.body.oas.missingFields.toString()).toEqual(
-      ['livingCountry', 'legalStatus', 'yearsInCanadaSince18'].toString()
-    );
-    expect(res.body.gis.result).toEqual(ResultOptions.MORE_INFO);
-    expect(res.body.gis.reason).toEqual(ResultReasons.MORE_INFO);
-    expect(res.body.gis.missingFields.toString()).toEqual(
-      ['maritalStatus', 'income'].toString()
-    );
-    expect(res.body.allFields.toString()).toEqual(
-      [
-        'age',
-        'livingCountry',
-        'legalStatus',
-        'yearsInCanadaSince18',
-        'maritalStatus',
-        'income',
-      ].toString()
-    );
-  });
-  it('requires 2 OAS and 2 GIS fields when only age/country provided', async () => {
+  it('requires 2 OAS and 0 GIS fields when only income/age/country provided', async () => {
     const { res } = await mockedRequestFactory({
+      income: 10000,
       age: 65,
       livingCountry: 'Canada',
     });
@@ -154,22 +140,20 @@ describe('field requirement analysis', () => {
     );
     expect(res.body.gis.result).toEqual(ResultOptions.MORE_INFO);
     expect(res.body.gis.reason).toEqual(ResultReasons.MORE_INFO);
-    expect(res.body.gis.missingFields.toString()).toEqual(
-      ['maritalStatus', 'income'].toString()
-    );
+    expect(res.body.gis.missingFields).toBeUndefined();
     expect(res.body.allFields.toString()).toEqual(
       [
+        'income',
         'age',
         'livingCountry',
         'legalStatus',
         'yearsInCanadaSince18',
-        'maritalStatus',
-        'income',
       ].toString()
     );
   });
-  it('requires 1 OAS and 2 GIS fields when only age/country/legal provided', async () => {
+  it('requires 1 OAS and 0 GIS fields when only income/age/country/legal provided', async () => {
     const { res } = await mockedRequestFactory({
+      income: 10000,
       age: 65,
       livingCountry: 'Canada',
       legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
@@ -181,22 +165,20 @@ describe('field requirement analysis', () => {
     );
     expect(res.body.gis.result).toEqual(ResultOptions.MORE_INFO);
     expect(res.body.gis.reason).toEqual(ResultReasons.MORE_INFO);
-    expect(res.body.gis.missingFields.toString()).toEqual(
-      ['maritalStatus', 'income'].toString()
-    );
+    expect(res.body.gis.missingFields).toBeUndefined();
     expect(res.body.allFields.toString()).toEqual(
       [
+        'income',
         'age',
         'livingCountry',
         'legalStatus',
         'yearsInCanadaSince18',
-        'maritalStatus',
-        'income',
       ].toString()
     );
   });
-  it('requires 0 OAS and 2 GIS fields when only age/country/legal/years provided', async () => {
+  it('requires 0 OAS and 1 GIS fields when only income/age/country/legal/years provided', async () => {
     const { res } = await mockedRequestFactory({
+      income: 10000,
       age: 65,
       livingCountry: 'Canada',
       legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
@@ -208,21 +190,22 @@ describe('field requirement analysis', () => {
     expect(res.body.gis.result).toEqual(ResultOptions.MORE_INFO);
     expect(res.body.gis.reason).toEqual(ResultReasons.MORE_INFO);
     expect(res.body.gis.missingFields.toString()).toEqual(
-      ['maritalStatus', 'income'].toString()
+      ['maritalStatus'].toString()
     );
     expect(res.body.allFields.toString()).toEqual(
       [
+        'income',
         'age',
         'livingCountry',
         'legalStatus',
         'yearsInCanadaSince18',
         'maritalStatus',
-        'income',
       ].toString()
     );
   });
-  it('requires 0 OAS and 1 GIS fields when only age/country/legal/years/marital=single provided', async () => {
+  it('requires 0 OAS and 0 GIS fields when only income/age/country/legal/years/marital=single provided', async () => {
     const { res } = await mockedRequestFactory({
+      income: 10000,
       age: 65,
       livingCountry: 'Canada',
       legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
@@ -232,24 +215,23 @@ describe('field requirement analysis', () => {
     expect(res.body.oas.result).toEqual(ResultOptions.ELIGIBLE);
     expect(res.body.oas.reason).toEqual(ResultReasons.NONE);
     expect(res.body.oas.missingFields).toBeUndefined();
-    expect(res.body.gis.result).toEqual(ResultOptions.MORE_INFO);
-    expect(res.body.gis.reason).toEqual(ResultReasons.MORE_INFO);
-    expect(res.body.gis.missingFields.toString()).toEqual(
-      ['income'].toString()
-    );
+    expect(res.body.gis.result).toEqual(ResultOptions.ELIGIBLE);
+    expect(res.body.gis.reason).toEqual(ResultReasons.NONE);
+    expect(res.body.gis.missingFields).toBeUndefined();
     expect(res.body.allFields.toString()).toEqual(
       [
+        'income',
         'age',
         'livingCountry',
         'legalStatus',
         'yearsInCanadaSince18',
         'maritalStatus',
-        'income',
       ].toString()
     );
   });
-  it('requires 0 OAS and 2 GIS fields when only age/country/legal/years/marital=married provided', async () => {
+  it('requires 0 OAS and 1 GIS fields when only income/age/country/legal/years/marital=married provided', async () => {
     const { res } = await mockedRequestFactory({
+      income: 10000,
       age: 65,
       livingCountry: 'Canada',
       legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
@@ -262,22 +244,23 @@ describe('field requirement analysis', () => {
     expect(res.body.gis.result).toEqual(ResultOptions.MORE_INFO);
     expect(res.body.gis.reason).toEqual(ResultReasons.MORE_INFO);
     expect(res.body.gis.missingFields.toString()).toEqual(
-      ['partnerReceivingOas', 'income'].toString()
+      ['partnerReceivingOas'].toString()
     );
     expect(res.body.allFields.toString()).toEqual(
       [
+        'income',
         'age',
         'livingCountry',
         'legalStatus',
         'yearsInCanadaSince18',
         'maritalStatus',
         'partnerReceivingOas',
-        'income',
       ].toString()
     );
   });
-  it('requires 0 OAS and 1 GIS fields when only age/country/legal/years/marital/partner provided', async () => {
+  it('requires 0 OAS and 0 GIS fields when all provided', async () => {
     const { res } = await mockedRequestFactory({
+      income: 10000,
       age: 65,
       livingCountry: 'Canada',
       legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
@@ -288,28 +271,34 @@ describe('field requirement analysis', () => {
     expect(res.body.oas.result).toEqual(ResultOptions.ELIGIBLE);
     expect(res.body.oas.reason).toEqual(ResultReasons.NONE);
     expect(res.body.oas.missingFields).toBeUndefined();
-    expect(res.body.gis.result).toEqual(ResultOptions.MORE_INFO);
-    expect(res.body.gis.reason).toEqual(ResultReasons.MORE_INFO);
-    expect(res.body.gis.missingFields.toString()).toEqual(
-      ['income'].toString()
-    );
+    expect(res.body.gis.result).toEqual(ResultOptions.ELIGIBLE);
+    expect(res.body.gis.reason).toEqual(ResultReasons.NONE);
+    expect(res.body.gis.missingFields).toBeUndefined();
     expect(res.body.allFields.toString()).toEqual(
       [
+        'income',
         'age',
         'livingCountry',
         'legalStatus',
         'yearsInCanadaSince18',
         'maritalStatus',
         'partnerReceivingOas',
-        'income',
       ].toString()
     );
   });
 });
 
 describe('basic OAS scenarios', () => {
+  it('returns "ineligible" when income over 129757', async () => {
+    const { res } = await mockedRequestFactory({
+      income: 129758,
+    });
+    expect(res.body.oas.result).toEqual(ResultOptions.INELIGIBLE);
+    expect(res.body.oas.reason).toEqual(ResultReasons.INCOME);
+  });
   it('returns "ineligible" when not citizen', async () => {
     const { res } = await mockedRequestFactory({
+      income: 10000,
       age: 65,
       livingCountry: 'Canada',
       legalStatus: LegalStatusOptions.NONE,
@@ -320,6 +309,7 @@ describe('basic OAS scenarios', () => {
   });
   it('returns "ineligible" when citizen and under 10 years in Canada', async () => {
     const { res } = await mockedRequestFactory({
+      income: 10000,
       age: 65,
       livingCountry: 'Canada',
       legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
@@ -330,6 +320,7 @@ describe('basic OAS scenarios', () => {
   });
   it('returns "eligible" when citizen and 10 years in Canada', async () => {
     const { res } = await mockedRequestFactory({
+      income: 10000,
       age: 65,
       livingCountry: 'Canada',
       legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
@@ -340,6 +331,7 @@ describe('basic OAS scenarios', () => {
   });
   it('returns "eligible" when living in Agreement and 20 years in Canada', async () => {
     const { res } = await mockedRequestFactory({
+      income: 10000,
       age: 65,
       livingCountry: 'Agreement',
       legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
@@ -350,6 +342,7 @@ describe('basic OAS scenarios', () => {
   });
   it('returns "conditionally eligible" when living in Agreement and under 20 years in Canada', async () => {
     const { res } = await mockedRequestFactory({
+      income: 10000,
       age: 65,
       livingCountry: 'Agreement',
       legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
@@ -360,6 +353,7 @@ describe('basic OAS scenarios', () => {
   });
   it('returns "eligible" when living in No Agreement and 20 years in Canada', async () => {
     const { res } = await mockedRequestFactory({
+      income: 10000,
       age: 65,
       livingCountry: 'No Agreement',
       legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
@@ -370,6 +364,7 @@ describe('basic OAS scenarios', () => {
   });
   it('returns "ineligible" when living in No Agreement and under 20 years in Canada', async () => {
     const { res } = await mockedRequestFactory({
+      income: 10000,
       age: 65,
       livingCountry: 'No Agreement',
       legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
@@ -380,6 +375,7 @@ describe('basic OAS scenarios', () => {
   });
   it('returns "eligible when 65" when age 55 and citizen and 20 years in Canada', async () => {
     const { res } = await mockedRequestFactory({
+      income: 10000,
       age: 55,
       livingCountry: 'Canada',
       legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
@@ -419,78 +415,78 @@ describe('basic GIS scenarios', () => {
     expect(res.body.gis.result).toEqual(ResultOptions.MORE_INFO);
     expect(res.body.gis.reason).toEqual(ResultReasons.MORE_INFO);
   });
-  it('returns "not eligible" when single and income over 18216', async () => {
+  it('returns "ineligible" when single and income over 18216', async () => {
     const { res } = await mockedRequestFactory({
+      income: 18217,
       age: 65,
       livingCountry: 'Canada',
       legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
       yearsInCanadaSince18: 20,
       maritalStatus: MaritalStatusOptions.SINGLE,
-      income: 18217,
     });
     expect(res.body.gis.result).toEqual(ResultOptions.INELIGIBLE);
     expect(res.body.gis.reason).toEqual(ResultReasons.INCOME);
   });
   it('returns "eligible" when single and income under 18216', async () => {
     const { res } = await mockedRequestFactory({
+      income: 18216,
       age: 65,
       livingCountry: 'Canada',
       legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
       yearsInCanadaSince18: 20,
       maritalStatus: MaritalStatusOptions.SINGLE,
-      income: 18216,
     });
     expect(res.body.gis.result).toEqual(ResultOptions.ELIGIBLE);
     expect(res.body.gis.reason).toEqual(ResultReasons.NONE);
   });
-  it('returns "not eligible" when married and no partner OAS and income over 43680', async () => {
+  it('returns "ineligible" when married and no partner OAS and income over 43680', async () => {
     const { res } = await mockedRequestFactory({
+      income: 43681,
       age: 65,
       livingCountry: 'Canada',
       legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
       yearsInCanadaSince18: 20,
       maritalStatus: MaritalStatusOptions.MARRIED,
       partnerReceivingOas: false,
-      income: 43681,
     });
     expect(res.body.gis.result).toEqual(ResultOptions.INELIGIBLE);
     expect(res.body.gis.reason).toEqual(ResultReasons.INCOME);
   });
   it('returns "eligible" when married and no partner OAS and income under 43680', async () => {
     const { res } = await mockedRequestFactory({
+      income: 43680,
       age: 65,
       livingCountry: 'Canada',
       legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
       yearsInCanadaSince18: 20,
       maritalStatus: MaritalStatusOptions.MARRIED,
       partnerReceivingOas: false,
-      income: 43680,
     });
     expect(res.body.gis.result).toEqual(ResultOptions.ELIGIBLE);
     expect(res.body.gis.reason).toEqual(ResultReasons.NONE);
   });
-  it('returns "not eligible" when married and partner OAS and income over 24048', async () => {
+  it('returns "ineligible" when married and partner OAS and income over 24048', async () => {
     const { res } = await mockedRequestFactory({
+      income: 24049,
       age: 65,
       livingCountry: 'Canada',
       legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
       yearsInCanadaSince18: 20,
       maritalStatus: MaritalStatusOptions.MARRIED,
       partnerReceivingOas: true,
-      income: 24049,
     });
     expect(res.body.gis.result).toEqual(ResultOptions.INELIGIBLE);
     expect(res.body.gis.reason).toEqual(ResultReasons.INCOME);
   });
   it('returns "eligible" when married and partner OAS and income under 24048', async () => {
     const { res } = await mockedRequestFactory({
+      income: 24048,
       age: 65,
       livingCountry: 'Canada',
       legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
       yearsInCanadaSince18: 20,
       maritalStatus: MaritalStatusOptions.MARRIED,
       partnerReceivingOas: true,
-      income: 24048,
     });
     expect(res.body.gis.result).toEqual(ResultOptions.ELIGIBLE);
     expect(res.body.gis.reason).toEqual(ResultReasons.NONE);
@@ -500,13 +496,13 @@ describe('basic GIS scenarios', () => {
 describe('thorough personas', () => {
   it('Tanu Singh: OAS eligible, GIS eligible', async () => {
     const { res } = await mockedRequestFactory({
+      income: 17000,
       age: 65,
       livingCountry: 'Canada',
       legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
       yearsInCanadaSince18: 47,
       maritalStatus: MaritalStatusOptions.MARRIED,
       partnerReceivingOas: true,
-      income: 17000,
     });
     expect(res.body.oas.result).toEqual(ResultOptions.ELIGIBLE);
     expect(res.body.oas.reason).toEqual(ResultReasons.NONE);
@@ -515,13 +511,13 @@ describe('thorough personas', () => {
   });
   it('Habon Aden: OAS conditionally eligible, GIS ineligible due to income', async () => {
     const { res } = await mockedRequestFactory({
+      income: 28000,
       age: 66,
       livingCountry: 'Jamaica',
       legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
       yearsInCanadaSince18: 18,
       maritalStatus: MaritalStatusOptions.SINGLE,
       partnerReceivingOas: undefined,
-      income: 28000,
     });
     expect(res.body.oas.result).toEqual(ResultOptions.CONDITIONAL);
     expect(res.body.oas.reason).toEqual(ResultReasons.YEARS_IN_CANADA);
@@ -530,13 +526,13 @@ describe('thorough personas', () => {
   });
   it('Miriam Krayem: OAS eligible when 65, GIS ineligible due to income', async () => {
     const { res } = await mockedRequestFactory({
+      income: 40000,
       age: 55,
       livingCountry: 'Canada',
       legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
       yearsInCanadaSince18: 30,
       maritalStatus: MaritalStatusOptions.DIVORCED,
       partnerReceivingOas: undefined,
-      income: 40000,
     });
     expect(res.body.oas.result).toEqual(ResultOptions.ELIGIBLE_WHEN_65);
     expect(res.body.oas.reason).toEqual(ResultReasons.AGE);
@@ -545,13 +541,13 @@ describe('thorough personas', () => {
   });
   it('Adam Smith: OAS eligible when 65, GIS ineligible due to income', async () => {
     const { res } = await mockedRequestFactory({
+      income: 25000,
       age: 62,
       livingCountry: 'Canada',
       legalStatus: LegalStatusOptions.PERMANENT_RESIDENT,
       yearsInCanadaSince18: 15,
       maritalStatus: MaritalStatusOptions.WIDOWED,
       partnerReceivingOas: undefined,
-      income: 25000,
     });
     expect(res.body.oas.result).toEqual(ResultOptions.ELIGIBLE_WHEN_65);
     expect(res.body.oas.reason).toEqual(ResultReasons.AGE);
@@ -563,13 +559,13 @@ describe('thorough personas', () => {
 describe('thorough extras', () => {
   it('returns "ineligible due to years in Canada" when living in Canada and 9 years in Canada', async () => {
     const { res } = await mockedRequestFactory({
+      income: 10000,
       age: 65,
       livingCountry: 'Canada',
       legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
       yearsInCanadaSince18: 9,
       maritalStatus: MaritalStatusOptions.SINGLE,
       partnerReceivingOas: undefined,
-      income: undefined,
     });
     expect(res.body.oas.result).toEqual(ResultOptions.INELIGIBLE);
     expect(res.body.oas.reason).toEqual(ResultReasons.YEARS_IN_CANADA);
@@ -578,28 +574,28 @@ describe('thorough extras', () => {
   });
   it('returns "conditionally eligible" when living in Agreement and 9 years in Canada', async () => {
     const { res } = await mockedRequestFactory({
+      income: 10000,
       age: 65,
       livingCountry: 'Agreement',
       legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
       yearsInCanadaSince18: 9,
       maritalStatus: MaritalStatusOptions.SINGLE,
       partnerReceivingOas: undefined,
-      income: undefined,
     });
     expect(res.body.oas.result).toEqual(ResultOptions.CONDITIONAL);
     expect(res.body.oas.reason).toEqual(ResultReasons.YEARS_IN_CANADA);
-    expect(res.body.gis.result).toEqual(ResultOptions.MORE_INFO);
-    expect(res.body.gis.reason).toEqual(ResultReasons.MORE_INFO);
+    expect(res.body.gis.result).toEqual(ResultOptions.ELIGIBLE);
+    expect(res.body.gis.reason).toEqual(ResultReasons.NONE);
   });
   it('returns "eligible" when living in Canada and 10 years in Canada', async () => {
     const { res } = await mockedRequestFactory({
+      income: 10000,
       age: 65,
       livingCountry: 'Canada',
       legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
       yearsInCanadaSince18: 10,
       maritalStatus: MaritalStatusOptions.SINGLE,
       partnerReceivingOas: undefined,
-      income: 10000,
     });
     expect(res.body.oas.result).toEqual(ResultOptions.ELIGIBLE);
     expect(res.body.oas.reason).toEqual(ResultReasons.NONE);
@@ -608,13 +604,13 @@ describe('thorough extras', () => {
   });
   it('returns "ineligible due to years in Canada" when not living in Canada and 19 years in Canada', async () => {
     const { res } = await mockedRequestFactory({
+      income: 10000,
       age: 65,
       livingCountry: 'Not Canada',
       legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
       yearsInCanadaSince18: 19,
       maritalStatus: MaritalStatusOptions.SINGLE,
       partnerReceivingOas: undefined,
-      income: 10000,
     });
     expect(res.body.oas.result).toEqual(ResultOptions.INELIGIBLE);
     expect(res.body.oas.reason).toEqual(ResultReasons.YEARS_IN_CANADA);
@@ -623,13 +619,13 @@ describe('thorough extras', () => {
   });
   it('returns "eligible" when not living in Canada and 20 years in Canada', async () => {
     const { res } = await mockedRequestFactory({
+      income: 15000,
       age: 65,
       livingCountry: 'Not Canada',
       legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
       yearsInCanadaSince18: 20,
       maritalStatus: MaritalStatusOptions.SINGLE,
       partnerReceivingOas: undefined,
-      income: 15000,
     });
     expect(res.body.oas.result).toEqual(ResultOptions.ELIGIBLE);
     expect(res.body.oas.reason).toEqual(ResultReasons.NONE);

@@ -40,6 +40,7 @@ export enum ResultReasons {
 
 // this is what the API expects to receive
 // don't forget to update OpenAPI!
+// do not require fields here, do it in the benefit-specific schemas
 export const RequestSchema = Joi.object({
   age: Joi.number().integer().max(150),
   livingCountry: Joi.string(),
@@ -55,11 +56,23 @@ export const RequestSchema = Joi.object({
 
 export const OasSchema = RequestSchema.concat(
   Joi.object({
-    // TODO: don't require when income over X
-    age: Joi.required(),
-    livingCountry: Joi.required(),
-    legalStatus: Joi.required(),
-    yearsInCanadaSince18: Joi.required(),
+    income: Joi.required(),
+    age: Joi.when('income', {
+      is: Joi.number().exist().greater(0).less(129757),
+      then: Joi.required(),
+    }),
+    livingCountry: Joi.when('income', {
+      is: Joi.number().exist().greater(0).less(129757),
+      then: Joi.required(),
+    }),
+    legalStatus: Joi.when('income', {
+      is: Joi.number().exist().greater(0).less(129757),
+      then: Joi.required(),
+    }),
+    yearsInCanadaSince18: Joi.when('income', {
+      is: Joi.number().exist().greater(0).less(129757),
+      then: Joi.required(),
+    }),
   })
 );
 
@@ -68,8 +81,9 @@ export const GisSchema = RequestSchema.concat(
     _oasEligible: Joi.string()
       .valid(...Object.values(ResultOptions))
       .required(),
+    income: Joi.required(),
     maritalStatus: Joi.when('_oasEligible', {
-      not: Joi.valid(ResultOptions.INELIGIBLE),
+      not: Joi.valid(ResultOptions.INELIGIBLE, ResultOptions.MORE_INFO),
       then: Joi.required(),
     }),
     partnerReceivingOas: Joi.boolean()
@@ -82,13 +96,9 @@ export const GisSchema = RequestSchema.concat(
         otherwise: Joi.boolean().falsy().valid(false),
       })
       .when('_oasEligible', {
-        is: Joi.valid(ResultOptions.INELIGIBLE),
+        is: Joi.valid(ResultOptions.INELIGIBLE, ResultOptions.MORE_INFO),
         then: Joi.optional(),
       }),
-    income: Joi.when('_oasEligible', {
-      not: Joi.valid(ResultOptions.INELIGIBLE),
-      then: Joi.required(),
-    }),
   })
 );
 
