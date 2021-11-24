@@ -27,10 +27,13 @@ const httpTrigger: AzureFunction = async function (
     context.log('GIS Result: ', resultGis);
 
     const allFields = [
-      ...Object.keys(value),
-      ...(resultOas.missingFields ? resultOas.missingFields : []),
-      ...(resultGis.missingFields ? resultGis.missingFields : []),
+      ...new Set([
+        ...Object.keys(value),
+        ...(resultOas.missingFields ? resultOas.missingFields : []),
+        ...(resultGis.missingFields ? resultGis.missingFields : []),
+      ]),
     ];
+    context.log('All visible fields:', allFields);
 
     // completion
     context.res = {
