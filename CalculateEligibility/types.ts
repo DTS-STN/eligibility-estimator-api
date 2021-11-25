@@ -28,7 +28,7 @@ export enum ResultOptions {
 
 export enum ResultReasons {
   NONE = `You meet the criteria`,
-  AGE = `Not yet 65`,
+  AGE = `Age does not meet requirement for this benefit`,
   YEARS_IN_CANADA = `Not enough years in Canada`,
   CITIZEN = `Not a Canadian citizen`,
   SOCIAL_AGREEMENT = 'Not in a country with a social agreement',

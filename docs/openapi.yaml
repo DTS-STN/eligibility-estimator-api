@@ -10,7 +10,7 @@ info:
     The code for this project is available [here](https://github.com/DTS-STN/eligibility-estimator-api).
 
 
-    **To interact with the API, press the "Try it out" button below on the right.**
+    **To interact with the API, click the "Try it out" button below on the right.**
 
 servers:
   - url: https://eligibilityestimatorapi.azurewebsites.net/api
@@ -26,13 +26,13 @@ paths:
       tags:
         - Endpoints
       parameters:
+        - $ref: '#/components/parameters/income'
         - $ref: '#/components/parameters/age'
         - $ref: '#/components/parameters/livingCountry'
         - $ref: '#/components/parameters/legalStatus'
         - $ref: '#/components/parameters/yearsInCanadaSince18'
         - $ref: '#/components/parameters/maritalStatus'
         - $ref: '#/components/parameters/partnerReceivingOas'
-        - $ref: '#/components/parameters/income'
       responses:
         '200':
           $ref: '#/components/responses/200'
@@ -73,7 +73,7 @@ components:
       format: string
       enum:
         - You meet the criteria
-        - Not yet 65
+        - Age does not meet requirement for this benefit
         - Not enough years in Canada
         - Not a Canadian citizen
         - Not in a country with a social agreement
@@ -153,30 +153,27 @@ components:
                   reason: Age does not meet requirement for this benefit
                   detail: You must be between 60 and 64 to be eligible for Allowance.
                 allFields:
+                  - income
                   - age
                   - livingCountry
                   - legalStatus
                   - yearsInCanadaSince18
                   - maritalStatus
                   - partnerReceivingOas
-                  - income
+
             'Blank request':
               value:
                 oas:
                   result: Need more information...
                   reason: Need more information...
-                  detail: Missing 4 required fields.
+                  detail: Missing 1 required field.
                   missingFields:
-                    - age
-                    - livingCountry
-                    - legalStatus
-                    - yearsInCanadaSince18
+                    - income
                 gis:
                   result: Need more information...
                   reason: Need more information...
-                  detail: Missing 2 required fields.
+                  detail: Missing 1 required field.
                   missingFields:
-                    - maritalStatus
                     - income
                 allowance:
                   result: Need more information...
@@ -185,23 +182,14 @@ components:
                   missingFields:
                     - income
                 allFields:
-                  - age
-                  - livingCountry
-                  - legalStatus
-                  - yearsInCanadaSince18
-                  - maritalStatus
                   - income
+
             'Ineligible case':
               value:
                 oas:
                   result: Ineligible!
-                  reason: Not enough years in Canada
-                  detail:
-                    You currently do not appear to be eligible for the OAS pension as you have
-                    indicated that you have not lived in Canada for the minimum period of time or
-                    lived in a country that Canada has a social security agreement with. However,
-                    you may be in the future if you reside in Canada for the minimum required number
-                    of years.
+                  reason: Income too high
+                  detail: Your income is too high to be eligible for OAS.
                 gis:
                   result: Ineligible!
                   reason: Not eligible for OAS
@@ -211,10 +199,7 @@ components:
                   reason: Income too high
                   detail: Your income is too high to be eligible for Allowance.
                 allFields:
-                  - age
-                  - livingCountry
-                  - legalStatus
-                  - yearsInCanadaSince18
+                  - income
 
     '400':
       description: Invalid request, typically because the input did not pass the validation rules.
@@ -241,11 +226,22 @@ components:
                   type: number.max
 
   parameters:
+    income:
+      name: income
+      in: query
+      description: The user's current (combined, if applicable) net income.
+      required: true
+      example: 10000
+      schema:
+        type: integer
+        description: Income in Canadian dollars.
+      allowEmptyValue: false
+
     age:
       name: age
       in: query
       description: The current age of the user, up to a max of 150.
-      required: true
+      required: false
       schema:
         type: integer
         description: Age, up to a max of 150.
@@ -315,7 +311,7 @@ components:
       in: query
       description: The current marital status of the user.
       required: false
-      example: 'Single'
+      example: 'Married'
       schema:
         type: string
         enum:
@@ -333,18 +329,7 @@ components:
       in: query
       description: Is the user's partner receiving OAS?
       required: false
-      example: false
+      example: true
       schema:
         type: boolean
-      allowEmptyValue: false
-
-    income:
-      name: income
-      in: query
-      description: The user's current (combined, if applicable) net income.
-      required: false
-      example: 10000
-      schema:
-        type: integer
-        description: Income in Canadian dollars.
       allowEmptyValue: false
