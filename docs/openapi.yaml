@@ -112,6 +112,8 @@ components:
           $ref: '#/components/schemas/ResultObject'
         gis:
           $ref: '#/components/schemas/ResultObject'
+        allowance:
+          $ref: '#/components/schemas/ResultObject'
         allFields:
           $ref: '#/components/schemas/Fields'
 
@@ -146,6 +148,10 @@ components:
                   result: Eligible!
                   reason: You meet the criteria
                   detail: Based on the information provided, you are eligible for GIS!
+                allowance:
+                  result: Ineligible!
+                  reason: Age does not meet requirement for this benefit
+                  detail: You must be between 60 and 64 to be eligible for Allowance.
                 allFields:
                   - age
                   - livingCountry
@@ -172,6 +178,12 @@ components:
                   missingFields:
                     - maritalStatus
                     - income
+                allowance:
+                  result: Need more information...
+                  reason: Need more information...
+                  detail: Missing 1 required field.
+                  missingFields:
+                    - income
                 allFields:
                   - age
                   - livingCountry
@@ -194,6 +206,10 @@ components:
                   result: Ineligible!
                   reason: Not eligible for OAS
                   detail: You need to be eligible for OAS to be eligible for GIS.
+                allowance:
+                  result: Ineligible!
+                  reason: Income too high
+                  detail: Your income is too high to be eligible for Allowance.
                 allFields:
                   - age
                   - livingCountry

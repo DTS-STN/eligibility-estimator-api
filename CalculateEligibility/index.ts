@@ -1,4 +1,5 @@
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';
+import checkAllowance from './checkAllowance';
 import checkGis from './checkGis';
 import checkOas from './checkOas';
 import { RequestSchema, ResultOptions } from './types';
@@ -26,11 +27,15 @@ const httpTrigger: AzureFunction = async function (
     const resultGis = checkGis(value, resultOas, context);
     context.log('GIS Result: ', resultGis);
 
+    const resultAllowance = checkAllowance(value, context);
+    context.log('Allowance Result: ', resultAllowance);
+
     const allFields = [
       ...new Set([
         ...Object.keys(value),
         ...(resultOas.missingFields ? resultOas.missingFields : []),
         ...(resultGis.missingFields ? resultGis.missingFields : []),
+        ...(resultAllowance.missingFields ? resultAllowance.missingFields : []),
       ]),
     ];
     context.log('All visible fields:', allFields);
@@ -38,7 +43,12 @@ const httpTrigger: AzureFunction = async function (
     // completion
     context.res = {
       status: 200,
-      body: { oas: resultOas, gis: resultGis, allFields },
+      body: {
+        oas: resultOas,
+        gis: resultGis,
+        allowance: resultAllowance,
+        allFields,
+      },
     };
   } catch (error) {
     context.res = {

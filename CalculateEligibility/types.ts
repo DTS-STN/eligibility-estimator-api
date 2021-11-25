@@ -107,6 +107,50 @@ export const GisSchema = RequestSchema.concat(
   })
 );
 
+export const AllowanceSchema = RequestSchema.concat(
+  Joi.object({
+    income: Joi.required(),
+    age: Joi.when('income', {
+      is: Joi.number().exist().greater(0).less(35616),
+      then: Joi.required(),
+    }),
+    livingCountry: Joi.when('age', {
+      is: Joi.number().exist().min(60).max(64),
+      then: Joi.required(),
+    }),
+    legalStatus: Joi.when('income', {
+      is: Joi.number().exist().greater(0).less(35616),
+      then: Joi.when('age', {
+        is: Joi.number().exist().min(60).max(64),
+        then: Joi.required(),
+      }),
+    }),
+    yearsInCanadaSince18: Joi.when('legalStatus', {
+      is: Joi.exist().valid(
+        LegalStatusOptions.CANADIAN_CITIZEN,
+        LegalStatusOptions.PERMANENT_RESIDENT,
+        LegalStatusOptions.STATUS_INDIAN,
+        LegalStatusOptions.TEMPORARY_RESIDENT
+      ),
+      then: Joi.required(),
+    }),
+    maritalStatus: Joi.when('income', {
+      is: Joi.number().exist().greater(0).less(35616),
+      then: Joi.when('age', {
+        is: Joi.number().exist().min(60).max(64),
+        then: Joi.required(),
+      }),
+    }),
+    partnerReceivingOas: Joi.when('maritalStatus', {
+      is: Joi.exist().valid(
+        MaritalStatusOptions.MARRIED,
+        MaritalStatusOptions.COMMONLAW
+      ),
+      then: Joi.required(),
+    }),
+  })
+);
+
 export interface CalculationParams {
   age?: number;
   livingCountry?: string;

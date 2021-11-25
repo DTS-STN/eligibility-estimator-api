@@ -475,6 +475,152 @@ describe('basic GIS scenarios', () => {
   });
 });
 
+describe('basic Allowance scenarios', () => {
+  it('returns "ineligible" when income over (or equal to) 35616', async () => {
+    const { res } = await mockedRequestFactory({
+      income: 35616,
+    });
+    expect(res.body.allowance.result).toEqual(ResultOptions.INELIGIBLE);
+    expect(res.body.allowance.reason).toEqual(ResultReasons.INCOME);
+  });
+  it('returns "needs more info" when income under 35616', async () => {
+    const { res } = await mockedRequestFactory({
+      income: 35615,
+    });
+    expect(res.body.allowance.result).toEqual(ResultOptions.MORE_INFO);
+    expect(res.body.allowance.reason).toEqual(ResultReasons.MORE_INFO);
+  });
+  it('returns "ineligible" when age over 64', async () => {
+    const { res } = await mockedRequestFactory({
+      income: 10000,
+      age: 65,
+    });
+    expect(res.body.allowance.result).toEqual(ResultOptions.INELIGIBLE);
+    expect(res.body.allowance.reason).toEqual(ResultReasons.AGE);
+  });
+  it('returns "ineligible" when age under 60', async () => {
+    const { res } = await mockedRequestFactory({
+      income: 10000,
+      age: 59,
+    });
+    expect(res.body.allowance.result).toEqual(ResultOptions.INELIGIBLE);
+    expect(res.body.allowance.reason).toEqual(ResultReasons.AGE);
+  });
+  it('returns "needs more info" when age 60', async () => {
+    const { res } = await mockedRequestFactory({
+      income: 10000,
+      age: 60,
+    });
+    expect(res.body.allowance.result).toEqual(ResultOptions.MORE_INFO);
+    expect(res.body.allowance.reason).toEqual(ResultReasons.MORE_INFO);
+  });
+  it('returns "ineligible" when not citizen', async () => {
+    const { res } = await mockedRequestFactory({
+      income: 10000,
+      age: 60,
+      livingCountry: 'Canada',
+      legalStatus: LegalStatusOptions.NONE,
+      yearsInCanadaSince18: 20,
+      maritalStatus: MaritalStatusOptions.MARRIED,
+      partnerReceivingOas: true,
+    });
+    expect(res.body.allowance.result).toEqual(ResultOptions.INELIGIBLE);
+    expect(res.body.allowance.reason).toEqual(ResultReasons.CITIZEN);
+  });
+  it('returns "ineligible" when citizen and under 10 years in Canada', async () => {
+    const { res } = await mockedRequestFactory({
+      income: 10000,
+      age: 60,
+      livingCountry: 'Canada',
+      legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
+      yearsInCanadaSince18: 9,
+      maritalStatus: MaritalStatusOptions.MARRIED,
+      partnerReceivingOas: true,
+    });
+    expect(res.body.allowance.result).toEqual(ResultOptions.INELIGIBLE);
+    expect(res.body.allowance.reason).toEqual(ResultReasons.YEARS_IN_CANADA);
+  });
+  it('returns "ineligible" when partner not receiving OAS', async () => {
+    const { res } = await mockedRequestFactory({
+      income: 10000,
+      age: 60,
+      livingCountry: 'Canada',
+      legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
+      yearsInCanadaSince18: 10,
+      maritalStatus: MaritalStatusOptions.MARRIED,
+      partnerReceivingOas: false,
+    });
+    expect(res.body.allowance.result).toEqual(ResultOptions.INELIGIBLE);
+    expect(res.body.allowance.reason).toEqual(ResultReasons.OAS);
+  });
+
+  it('returns "eligible" when citizen and 10 years in Canada', async () => {
+    const { res } = await mockedRequestFactory({
+      income: 10000,
+      age: 60,
+      livingCountry: 'Canada',
+      legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
+      yearsInCanadaSince18: 10,
+      maritalStatus: MaritalStatusOptions.MARRIED,
+      partnerReceivingOas: true,
+    });
+    expect(res.body.allowance.result).toEqual(ResultOptions.ELIGIBLE);
+    expect(res.body.allowance.reason).toEqual(ResultReasons.NONE);
+  });
+  it('returns "eligible" when living in Agreement and 10 years in Canada', async () => {
+    const { res } = await mockedRequestFactory({
+      income: 10000,
+      age: 60,
+      livingCountry: 'Agreement',
+      legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
+      yearsInCanadaSince18: 10,
+      maritalStatus: MaritalStatusOptions.MARRIED,
+      partnerReceivingOas: true,
+    });
+    expect(res.body.allowance.result).toEqual(ResultOptions.ELIGIBLE);
+    expect(res.body.allowance.reason).toEqual(ResultReasons.NONE);
+  });
+  it('returns "conditionally eligible" when living in Agreement and under 10 years in Canada', async () => {
+    const { res } = await mockedRequestFactory({
+      income: 10000,
+      age: 60,
+      livingCountry: 'Agreement',
+      legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
+      yearsInCanadaSince18: 9,
+      maritalStatus: MaritalStatusOptions.MARRIED,
+      partnerReceivingOas: true,
+    });
+    expect(res.body.allowance.result).toEqual(ResultOptions.CONDITIONAL);
+    expect(res.body.allowance.reason).toEqual(ResultReasons.YEARS_IN_CANADA);
+  });
+  it('returns "eligible" when living in No Agreement and 10 years in Canada', async () => {
+    const { res } = await mockedRequestFactory({
+      income: 10000,
+      age: 60,
+      livingCountry: 'No Agreement',
+      legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
+      yearsInCanadaSince18: 10,
+      maritalStatus: MaritalStatusOptions.MARRIED,
+      partnerReceivingOas: true,
+    });
+    expect(res.body.allowance.result).toEqual(ResultOptions.ELIGIBLE);
+    expect(res.body.allowance.reason).toEqual(ResultReasons.NONE);
+  });
+  it('returns "ineligible" when living in No Agreement and under 10 years in Canada', async () => {
+    const { res } = await mockedRequestFactory({
+      income: 10000,
+      age: 60,
+      livingCountry: 'No Agreement',
+      legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
+      yearsInCanadaSince18: 9,
+      maritalStatus: MaritalStatusOptions.MARRIED,
+      partnerReceivingOas: true,
+    });
+    expect(res.body.allowance.result).toEqual(ResultOptions.INELIGIBLE);
+    expect(res.body.allowance.reason).toEqual(ResultReasons.YEARS_IN_CANADA);
+  });
+});
+
 describe('thorough personas', () => {
   it('Tanu Singh: OAS eligible, GIS eligible', async () => {
     const { res } = await mockedRequestFactory({
