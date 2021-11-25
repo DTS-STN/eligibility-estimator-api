@@ -87,47 +87,35 @@ describe('field requirement analysis', () => {
     );
     expect(res.body.allFields.toString()).toEqual(['income'].toString());
   });
-  it('requires 4 OAS and 0 GIS fields when only income provided', async () => {
+  it('requires 3 OAS and 0 GIS fields when only income provided', async () => {
     const { res } = await mockedRequestFactory({ income: 10000 });
     expect(res.body.oas.result).toEqual(ResultOptions.MORE_INFO);
     expect(res.body.oas.reason).toEqual(ResultReasons.MORE_INFO);
     expect(res.body.oas.missingFields.toString()).toEqual(
-      ['age', 'livingCountry', 'legalStatus', 'yearsInCanadaSince18'].toString()
+      ['age', 'livingCountry', 'legalStatus'].toString()
     );
     expect(res.body.gis.result).toEqual(ResultOptions.MORE_INFO);
     expect(res.body.gis.reason).toEqual(ResultReasons.MORE_INFO);
     expect(res.body.gis.missingFields).toBeUndefined();
     expect(res.body.allFields.toString()).toEqual(
-      [
-        'income',
-        'age',
-        'livingCountry',
-        'legalStatus',
-        'yearsInCanadaSince18',
-      ].toString()
+      ['income', 'age', 'livingCountry', 'legalStatus'].toString()
     );
   });
-  it('requires 3 OAS and 0 GIS fields when only income/age provided', async () => {
+  it('requires 2 OAS and 0 GIS fields when only income/age provided', async () => {
     const { res } = await mockedRequestFactory({ income: 10000, age: 65 });
     expect(res.body.oas.result).toEqual(ResultOptions.MORE_INFO);
     expect(res.body.oas.reason).toEqual(ResultReasons.MORE_INFO);
     expect(res.body.oas.missingFields.toString()).toEqual(
-      ['livingCountry', 'legalStatus', 'yearsInCanadaSince18'].toString()
+      ['livingCountry', 'legalStatus'].toString()
     );
     expect(res.body.gis.result).toEqual(ResultOptions.MORE_INFO);
     expect(res.body.gis.reason).toEqual(ResultReasons.MORE_INFO);
     expect(res.body.gis.missingFields).toBeUndefined();
     expect(res.body.allFields.toString()).toEqual(
-      [
-        'income',
-        'age',
-        'livingCountry',
-        'legalStatus',
-        'yearsInCanadaSince18',
-      ].toString()
+      ['income', 'age', 'livingCountry', 'legalStatus'].toString()
     );
   });
-  it('requires 2 OAS and 0 GIS fields when only income/age/country provided', async () => {
+  it('requires 1 OAS and 0 GIS fields when only income/age/country provided', async () => {
     const { res } = await mockedRequestFactory({
       income: 10000,
       age: 65,
@@ -136,19 +124,13 @@ describe('field requirement analysis', () => {
     expect(res.body.oas.result).toEqual(ResultOptions.MORE_INFO);
     expect(res.body.oas.reason).toEqual(ResultReasons.MORE_INFO);
     expect(res.body.oas.missingFields.toString()).toEqual(
-      ['legalStatus', 'yearsInCanadaSince18'].toString()
+      ['legalStatus'].toString()
     );
     expect(res.body.gis.result).toEqual(ResultOptions.MORE_INFO);
     expect(res.body.gis.reason).toEqual(ResultReasons.MORE_INFO);
     expect(res.body.gis.missingFields).toBeUndefined();
     expect(res.body.allFields.toString()).toEqual(
-      [
-        'income',
-        'age',
-        'livingCountry',
-        'legalStatus',
-        'yearsInCanadaSince18',
-      ].toString()
+      ['income', 'age', 'livingCountry', 'legalStatus'].toString()
     );
   });
   it('requires 1 OAS and 0 GIS fields when only income/age/country/legal provided', async () => {

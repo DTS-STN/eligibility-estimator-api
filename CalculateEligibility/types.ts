@@ -42,6 +42,7 @@ export enum ResultReasons {
 // don't forget to update OpenAPI!
 // do not require fields here, do it in the benefit-specific schemas
 export const RequestSchema = Joi.object({
+  income: Joi.number().integer(),
   age: Joi.number().integer().max(150),
   livingCountry: Joi.string(),
   legalStatus: Joi.string().valid(...Object.values(LegalStatusOptions)),
@@ -51,7 +52,6 @@ export const RequestSchema = Joi.object({
     .message('Years in Canada should be no more than age minus 18'),
   maritalStatus: Joi.string().valid(...Object.values(MaritalStatusOptions)),
   partnerReceivingOas: Joi.boolean(),
-  income: Joi.number().integer(),
 });
 
 export const OasSchema = RequestSchema.concat(
@@ -69,8 +69,13 @@ export const OasSchema = RequestSchema.concat(
       is: Joi.number().exist().greater(0).less(129757),
       then: Joi.required(),
     }),
-    yearsInCanadaSince18: Joi.when('income', {
-      is: Joi.number().exist().greater(0).less(129757),
+    yearsInCanadaSince18: Joi.when('legalStatus', {
+      is: Joi.exist().valid(
+        LegalStatusOptions.CANADIAN_CITIZEN,
+        LegalStatusOptions.PERMANENT_RESIDENT,
+        LegalStatusOptions.STATUS_INDIAN,
+        LegalStatusOptions.TEMPORARY_RESIDENT
+      ),
       then: Joi.required(),
     }),
   })
