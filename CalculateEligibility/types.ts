@@ -35,6 +35,7 @@ export enum ResultReasons {
   MORE_INFO = 'Need more information...',
   OAS = 'Not eligible for OAS',
   INCOME = 'Income too high',
+  MARITAL = 'Your marital status does not meet the requirement for this benefit',
   INVALID = `Entered data is invalid`,
 }
 

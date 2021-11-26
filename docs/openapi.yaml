@@ -80,6 +80,7 @@ components:
         - Need more information...
         - Not eligible for OAS
         - Income too high
+        - Your marital status does not meet the requirement for this benefit
         - Entered data is invalid
 
     ResultObject:
@@ -106,6 +107,7 @@ components:
       required:
         - oas
         - gis
+        - allowance
         - allFields
       properties:
         oas:
@@ -196,10 +198,16 @@ components:
                   detail: You need to be eligible for OAS to be eligible for GIS.
                 allowance:
                   result: Ineligible!
-                  reason: Income too high
-                  detail: Your income is too high to be eligible for Allowance.
+                  reason: Age does not meet requirement for this benefit
+                  detail: You must be between 60 and 64 to be eligible for Allowance.
                 allFields:
                   - income
+                  - age
+                  - livingCountry
+                  - legalStatus
+                  - yearsInCanadaSince18
+                  - maritalStatus
+                  - partnerReceivingOas
 
     '400':
       description: Invalid request, typically because the input did not pass the validation rules.

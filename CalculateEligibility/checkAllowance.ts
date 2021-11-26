@@ -1,10 +1,11 @@
 import { Context } from '@azure/functions';
 import getIsAgreementCountry from './helpers/socialAgreement';
 import {
+  AllowanceSchema,
   CalculationParams,
   CalculationResult,
   LegalStatusOptions,
-  AllowanceSchema,
+  MaritalStatusOptions,
   ResultOptions,
   ResultReasons,
 } from './types';
@@ -32,6 +33,9 @@ export default function checkAllowance(
         LegalStatusOptions.TEMPORARY_RESIDENT,
       ].includes(value.legalStatus)
     : undefined;
+  const partnered =
+    value.maritalStatus == MaritalStatusOptions.MARRIED ||
+    value.maritalStatus == MaritalStatusOptions.COMMONLAW;
 
   // remove after confirming requirements
   const requiredYearsInCanada = value.livingCountry === 'Canada' ? 10 : 10;
@@ -41,14 +45,7 @@ export default function checkAllowance(
     : undefined;
 
   // main checks
-  if (value.partnerReceivingOas === false) {
-    return {
-      result: ResultOptions.INELIGIBLE,
-      reason: ResultReasons.OAS,
-      detail:
-        'Your partner must be receiving OAS to be eligible for Allowance.',
-    };
-  } else if (value.age < 60 || value.age > 64) {
+  if (value.age < 60 || value.age > 64) {
     return {
       result: ResultOptions.INELIGIBLE,
       reason: ResultReasons.AGE,
@@ -59,6 +56,19 @@ export default function checkAllowance(
       result: ResultOptions.INELIGIBLE,
       reason: ResultReasons.INCOME,
       detail: 'Your income is too high to be eligible for Allowance.',
+    };
+  } else if (!partnered) {
+    return {
+      result: ResultOptions.INELIGIBLE,
+      reason: ResultReasons.MARITAL,
+      detail: 'You must be common-law or married to be eligible for Allowance.',
+    };
+  } else if (value.partnerReceivingOas === false) {
+    return {
+      result: ResultOptions.INELIGIBLE,
+      reason: ResultReasons.OAS,
+      detail:
+        'Your partner must be receiving OAS to be eligible for Allowance.',
     };
   } else if (
     canadianCitizen &&

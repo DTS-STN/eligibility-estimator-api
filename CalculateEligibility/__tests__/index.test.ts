@@ -540,6 +540,32 @@ describe('basic Allowance scenarios', () => {
     expect(res.body.allowance.result).toEqual(ResultOptions.INELIGIBLE);
     expect(res.body.allowance.reason).toEqual(ResultReasons.YEARS_IN_CANADA);
   });
+  it('returns "ineligible" when widowed', async () => {
+    const { res } = await mockedRequestFactory({
+      income: 10000,
+      age: 60,
+      livingCountry: 'Canada',
+      legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
+      yearsInCanadaSince18: 10,
+      maritalStatus: MaritalStatusOptions.WIDOWED,
+      partnerReceivingOas: false,
+    });
+    expect(res.body.allowance.result).toEqual(ResultOptions.INELIGIBLE);
+    expect(res.body.allowance.reason).toEqual(ResultReasons.MARITAL);
+  });
+  it('returns "ineligible" when single', async () => {
+    const { res } = await mockedRequestFactory({
+      income: 10000,
+      age: 60,
+      livingCountry: 'Canada',
+      legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
+      yearsInCanadaSince18: 10,
+      maritalStatus: MaritalStatusOptions.SINGLE,
+      partnerReceivingOas: false,
+    });
+    expect(res.body.allowance.result).toEqual(ResultOptions.INELIGIBLE);
+    expect(res.body.allowance.reason).toEqual(ResultReasons.MARITAL);
+  });
   it('returns "ineligible" when partner not receiving OAS', async () => {
     const { res } = await mockedRequestFactory({
       income: 10000,
@@ -553,7 +579,6 @@ describe('basic Allowance scenarios', () => {
     expect(res.body.allowance.result).toEqual(ResultOptions.INELIGIBLE);
     expect(res.body.allowance.reason).toEqual(ResultReasons.OAS);
   });
-
   it('returns "eligible" when citizen and 10 years in Canada', async () => {
     const { res } = await mockedRequestFactory({
       income: 10000,
