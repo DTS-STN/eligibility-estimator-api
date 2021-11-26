@@ -151,7 +151,6 @@ resources:
             format: string
             enum:
               - Eligible!
-              - Eligible when 65.
               - Ineligible!
               - Conditionally eligible...
               - Need more information...

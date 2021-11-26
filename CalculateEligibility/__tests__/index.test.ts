@@ -363,7 +363,7 @@ describe('basic OAS scenarios', () => {
       legalStatus: LegalStatusOptions.CANADIAN_CITIZEN,
       yearsInCanadaSince18: 20,
     });
-    expect(res.body.oas.result).toEqual(ResultOptions.ELIGIBLE_WHEN_65);
+    expect(res.body.oas.result).toEqual(ResultOptions.INELIGIBLE);
     expect(res.body.oas.reason).toEqual(ResultReasons.AGE);
   });
 });
@@ -832,10 +832,10 @@ describe('thorough personas', () => {
       maritalStatus: MaritalStatusOptions.DIVORCED,
       partnerReceivingOas: undefined,
     });
-    expect(res.body.oas.result).toEqual(ResultOptions.ELIGIBLE_WHEN_65);
+    expect(res.body.oas.result).toEqual(ResultOptions.INELIGIBLE);
     expect(res.body.oas.reason).toEqual(ResultReasons.AGE);
     expect(res.body.gis.result).toEqual(ResultOptions.INELIGIBLE);
-    expect(res.body.gis.reason).toEqual(ResultReasons.INCOME);
+    expect(res.body.gis.reason).toEqual(ResultReasons.OAS);
   });
   it('Adam Smith: OAS eligible when 65, GIS ineligible due to income', async () => {
     const { res } = await mockedRequestFactory({
@@ -847,10 +847,10 @@ describe('thorough personas', () => {
       maritalStatus: MaritalStatusOptions.WIDOWED,
       partnerReceivingOas: undefined,
     });
-    expect(res.body.oas.result).toEqual(ResultOptions.ELIGIBLE_WHEN_65);
+    expect(res.body.oas.result).toEqual(ResultOptions.INELIGIBLE);
     expect(res.body.oas.reason).toEqual(ResultReasons.AGE);
     expect(res.body.gis.result).toEqual(ResultOptions.INELIGIBLE);
-    expect(res.body.gis.reason).toEqual(ResultReasons.INCOME);
+    expect(res.body.gis.reason).toEqual(ResultReasons.OAS);
   });
 });
 

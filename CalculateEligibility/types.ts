@@ -19,7 +19,6 @@ export enum LegalStatusOptions {
 
 export enum ResultOptions {
   ELIGIBLE = `Eligible!`,
-  ELIGIBLE_WHEN_65 = `Eligible when 65.`,
   INELIGIBLE = `Ineligible!`,
   CONDITIONAL = `Conditionally eligible...`,
   MORE_INFO = 'Need more information...',

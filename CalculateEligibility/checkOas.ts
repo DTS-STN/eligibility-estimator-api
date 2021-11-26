@@ -55,7 +55,7 @@ export default function checkOas(
       };
     } else {
       return {
-        result: ResultOptions.ELIGIBLE_WHEN_65,
+        result: ResultOptions.INELIGIBLE,
         reason: ResultReasons.AGE,
         detail: 'You will be eligible when you turn 65.',
       };
