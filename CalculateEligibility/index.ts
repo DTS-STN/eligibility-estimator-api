@@ -1,4 +1,5 @@
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';
+import checkAfs from './checkAfs';
 import checkAllowance from './checkAllowance';
 import checkGis from './checkGis';
 import checkOas from './checkOas';
@@ -30,12 +31,16 @@ const httpTrigger: AzureFunction = async function (
     const resultAllowance = checkAllowance(value, context);
     context.log('Allowance Result: ', resultAllowance);
 
+    const resultAfs = checkAfs(value, context);
+    context.log('Allowance for Survivor Result: ', resultAfs);
+
     const allFields = [
       ...new Set([
         ...Object.keys(value),
         ...(resultOas.missingFields ? resultOas.missingFields : []),
         ...(resultGis.missingFields ? resultGis.missingFields : []),
         ...(resultAllowance.missingFields ? resultAllowance.missingFields : []),
+        ...(resultAfs.missingFields ? resultAfs.missingFields : []),
       ]),
     ];
     context.log('All visible fields:', allFields);
@@ -47,6 +52,7 @@ const httpTrigger: AzureFunction = async function (
         oas: resultOas,
         gis: resultGis,
         allowance: resultAllowance,
+        afs: resultAfs,
         allFields,
       },
     };

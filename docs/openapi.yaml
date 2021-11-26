@@ -108,6 +108,7 @@ components:
         - oas
         - gis
         - allowance
+        - afs
         - allFields
       properties:
         oas:
@@ -115,6 +116,8 @@ components:
         gis:
           $ref: '#/components/schemas/ResultObject'
         allowance:
+          $ref: '#/components/schemas/ResultObject'
+        afs:
           $ref: '#/components/schemas/ResultObject'
         allFields:
           $ref: '#/components/schemas/Fields'
@@ -154,6 +157,10 @@ components:
                   result: Ineligible!
                   reason: Age does not meet requirement for this benefit
                   detail: You must be between 60 and 64 to be eligible for Allowance.
+                afs:
+                  result: Ineligible!
+                  reason: Age does not meet requirement for this benefit
+                  detail: You must be between 60 and 64 to be eligible for Allowance for Survivor.
                 allFields:
                   - income
                   - age
@@ -183,6 +190,12 @@ components:
                   detail: Missing 1 required field.
                   missingFields:
                     - income
+                afs:
+                  result: Need more information...
+                  reason: Need more information...
+                  detail: Missing 1 required field.
+                  missingFields:
+                    - income
                 allFields:
                   - income
 
@@ -200,6 +213,10 @@ components:
                   result: Ineligible!
                   reason: Age does not meet requirement for this benefit
                   detail: You must be between 60 and 64 to be eligible for Allowance.
+                afs:
+                  result: Ineligible!
+                  reason: Age does not meet requirement for this benefit
+                  detail: You must be between 60 and 64 to be eligible for Allowance for Survivor.
                 allFields:
                   - income
                   - age
